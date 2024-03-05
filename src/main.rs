@@ -1,47 +1,10 @@
-
 mod file_work;
-mod week;
+mod work;
 
-mod prelude {
-    pub use crate::week::Work;
-    pub use crate::week::Week;
-    pub use crate::week::Year;
-}
-use prelude::*;
-use crate::file_work::{create_file, delete_file, get_current_path, write_into_file};
-
+use chrono::TimeZone;
+use work::Work;
 fn main() {
-    delete_file(&get_current_path().unwrap().join("json.txt"));
-
-    let work = Work::create_work("Homework".to_string(), "todo algebra".to_string(), 600);
-
-    let monday = vec![work.clone(), work.clone()];
-
-    let week = Week{
-        week_number: 0,
-        week_year: 0,
-        monday:    monday.clone(),
-        tuesday:   monday.clone(),
-        wednesday: monday.clone(),
-        thursday:  monday.clone(),
-        friday:    monday.clone(),
-        saturday:  monday.clone(),
-        sunday:    monday.clone(),
-    };
-
-    let week_vec = vec![week.clone(), week.clone(), week.clone()];
-
-    let year = Year{ weeks: week_vec };
-
-    let json_string = serde_json::to_string(&year.save()).unwrap();
-
-    println!("{}", json_string);
-
-    let file = create_file(&get_current_path().unwrap(), "json.txt").expect("bombaclat");
-
-    write_into_file(file, serde_json::to_string(&work.humanify_time()).unwrap());
+    let work_1 = Work::from("Finish the H/w".to_string(), "Finish: \nGeometry, Algebra, English".to_string(), chrono::Utc.timestamp_opt(1123123, 0).unwrap().timestamp(), chrono::Utc.timestamp_opt(1123312, 0).unwrap().timestamp());
+    println!("{}", work_1.to_string());
+    println!("{}", work_1.to_json_string());
 }
-
-
-
-
