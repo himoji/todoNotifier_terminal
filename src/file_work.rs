@@ -1,6 +1,6 @@
 use std::env::current_dir;
 use std::fs;
-use std::fs::{create_dir_all, File, ReadDir};
+use std::fs::{create_dir_all, File};
 use std::io::{Error, Write};
 use std::path::{Path, PathBuf};
 
