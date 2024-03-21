@@ -8,7 +8,7 @@ Explanation:
 */
 
 use chrono::TimeZone;
-pub enum WorkParam {
+pub enum WorkParams {
     Name(String), 
     Desc(String),
     DateStart(i64),
@@ -42,18 +42,18 @@ impl Work{
         serde_json::to_string(&self).map_err(|e| print!("Failed to convert into string: {e}")).unwrap()
     }
     
-    pub fn edit(&mut self, param: WorkParam) {
+    pub fn edit(&mut self, param: WorkParams) {
         match param{
-            WorkParam::Name(new_val) => {
+            WorkParams::Name(new_val) => {
                 self.name = new_val;
             }
-            WorkParam::Desc(new_val) => {
+            WorkParams::Desc(new_val) => {
                 self.desc = new_val;
             }
-            WorkParam::DateStart(new_val) => {
+            WorkParams::DateStart(new_val) => {
                 self.date_start= new_val;
             }
-            WorkParam::DateEnd(new_val)=> {
+            WorkParams::DateEnd(new_val)=> {
                 self.date_end = new_val;
             }
         }

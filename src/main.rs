@@ -4,11 +4,29 @@ mod terminal;
 
 use chrono::TimeZone;
 use work::Work;
+use crate::terminal::MainSelect;
+
 fn main() {
     let MAX_SIZE: u8 = 10;
     let mut vector = Vec::with_capacity(MAX_SIZE as usize);
 
     'main_loop: loop {
+
+        match terminal::select_print() {
+            MainSelect::NewWork => {
+                //call work_create terminal
+            }
+            MainSelect::EditWork => {
+                //call work_edit terminal 
+            }
+            MainSelect::ExportWorks => {
+                //call export_year terminal 
+            }
+            MainSelect::Error => {
+                println!("Something went wrong!");
+                continue 'main_loop
+            }
+        }
         // select:
         //     new work, edit work, export
     }
