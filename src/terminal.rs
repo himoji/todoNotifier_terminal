@@ -7,11 +7,11 @@ pub enum MainSelect{
 fn user_select(string_show: &str) -> u8 {
     println!("{}", string_show);
 
-    let mut select;
+    let mut select = Default::default();
 
     std::io::stdin().read_line(&mut select).expect("Failed to get user selected");
     
-    let mut select: u8 = select.parse().unwrap();
+    let mut select: u8 = select.trim().parse().unwrap();
     select
     
 }
@@ -72,17 +72,17 @@ pub fn input_edit_work_params() -> WorkParams {
             let param = user_input("New value:\n");
             WorkParams::DateEnd(param)
         },
-        
+
         _ => {panic!("Failed to get input edit params")}
     }
 }
 
-pub fn export_works(work_vec: Vec<Work>) -> String {
+pub fn export_works(work_vec: &Vec<Work>) -> String {
     let mut string = String::new();
-    
+
     for work in work_vec{
         string.push_str(&*work.to_json_string());
     }
-    
+
     string
 }

@@ -34,7 +34,21 @@ impl Work{
     pub fn from(name: String, desc: String, date_start: i64, date_end: i64) -> Work {
         Work{name, desc, date_start, date_end}
     }
-
+    pub fn from_vec(vec: Vec<WorkParams>) -> Work {
+        let mut name= String::new();
+        let mut desc= String::new();
+        let mut date_start = 0;
+        let mut date_end= 0;
+        for i in vec {
+            match i {
+                WorkParams::Name(s) => {name = s;}
+                WorkParams::Desc(s) => {desc = s;}
+                WorkParams::DateStart(i) => {date_start = i;}
+                WorkParams::DateEnd(i) => {date_end = i;}
+            }
+        }
+        Work{name,desc,date_start, date_end}
+    }
     pub fn from_string(string: String) -> Work{
         serde_json::from_str(&string).unwrap()
     }
