@@ -1,7 +1,7 @@
 use crate::work::{Work, WorkParams};
 
 pub enum MainSelect{
-    NewWork, EditWork, ExportWorks, Error
+    NewWork, EditWork, ExportWorks, PrintReadable,Error
 }
 
 pub fn user_select(string_show: &str) -> u8 {
@@ -30,10 +30,11 @@ pub fn user_input<T: std::str::FromStr>(string_show: &str) -> T {
 
 
 pub fn select_print() -> MainSelect {
-    match user_select("Select:\n1)New work\n2)Edit work\n3)Export Year") {
+    match user_select("Select:\n1)New work\n2)Edit work\n3)Export Year\n4)Print readable") {
         1 => {MainSelect::NewWork},
         2 => {MainSelect::EditWork},
         3 => {MainSelect::ExportWorks},
+        4 => {MainSelect::PrintReadable},
         _ => {MainSelect::Error}
     }
 }

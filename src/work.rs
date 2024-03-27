@@ -7,6 +7,7 @@ Explanation:
     date_end: Stands for task's/work's end DateTime in seconds
 */
 
+use std::time::Duration;
 use chrono::TimeZone;
 pub enum WorkParams {
     Name(String), 
@@ -76,7 +77,7 @@ impl Work{
 
 impl std::fmt::Display for Work {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "Name: {}\nDesc: {}\nStart: {}\nDuration: ~{} minutes\nEnd: {}\n", self.name, self.desc, chrono::Utc.timestamp_opt(self.date_start, 0).unwrap(), (self.date_end - self.date_start)/60, chrono::Utc.timestamp_opt(self.date_end, 0).unwrap())
+        write!(f, "Name: {}\nDesc: {}\nStart: {}\nDuration: {}\nEnd: {}\n", self.name, self.desc, chrono::Utc.timestamp_opt(self.date_start, 0).unwrap(), humantime::format_duration(Duration::from_secs( (self.date_end - self.date_start).unsigned_abs())), chrono::Utc.timestamp_opt(self.date_end, 0).unwrap())
     }
 }
 

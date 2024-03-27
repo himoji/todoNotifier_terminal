@@ -28,6 +28,11 @@ fn main() {
             MainSelect::ExportWorks => {
                 println!("{}", terminal::export_works(&vector));
             }
+            MainSelect::PrintReadable => {
+                for work in &vector{
+                    println!("{work}");
+                }
+            }
             MainSelect::Error => {
                 println!("Something went wrong!");
                 continue 'main_loop
