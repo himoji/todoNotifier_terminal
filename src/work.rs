@@ -25,6 +25,7 @@ pub struct Work {
 
 impl Work{
     pub fn new() -> Work {
+        //!Creates default empty work
         Work{
             name: "".to_string(),
             desc: "".to_string(),
@@ -33,9 +34,12 @@ impl Work{
         }
     }
     pub fn from(name: String, desc: String, date_start: i64, date_end: i64) -> Work {
+        //!Creates work with specified params
         Work{name, desc, date_start, date_end}
     }
     pub fn from_vec(vec: Vec<WorkParams>) -> Work {
+        //!Parse from vector of works aka Vec< Work >
+        //!Iteration through all items in vector
         let mut name= String::new();
         let mut desc= String::new();
         let mut date_start = 0;
@@ -51,13 +55,16 @@ impl Work{
         Work{name,desc,date_start, date_end}
     }
     pub fn from_string(string: String) -> Work {
+        //!Parse from String
         serde_json::from_str(&string).unwrap()
     }
     pub fn to_json_string(&self) -> String {
+        //!Converts work to json, return as String
         serde_json::to_string(&self).map_err(|e| print!("Failed to convert into string: {e}")).unwrap()
     }
     
     pub fn edit(&mut self, param: WorkParams) {
+        //!Edits specified param
         match param{
             WorkParams::Name(new_val) => {
                 self.name = new_val;
@@ -73,18 +80,27 @@ impl Work{
             }
         }
     }
+    
+    pub fn get_time_progress(&self) -> u8 {
+        //!Returns the percent of time passed
+        if chrono::Utc::now().timestamp() <= self.date_start {0}
+        else if chrono::Utc::now().timestamp() >= self.date_end {100}
+        else {
+            return ((chrono::Utc::now().timestamp() - self.date_start) / self.date_start - self.date_end) as u8;
+        }
+    }
 }
 
 impl std::fmt::Display for Work {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "Name: {}\nDesc: {}\nStart: {}\nDuration: {}\nEnd: {}\n", self.name, self.desc, chrono::Utc.timestamp_opt(self.date_start, 0).unwrap(), humantime::format_duration(Duration::from_secs( (self.date_end - self.date_start).unsigned_abs())), chrono::Utc.timestamp_opt(self.date_end, 0).unwrap())
+        write!(f, "Name: {}\nDesc: {}\nStart: {}\nDuration: {}\nEnd: {}\nProgress by time passed: {}%\n", self.name, self.desc, chrono::Utc.timestamp_opt(self.date_start, 0).unwrap(), humantime::format_duration(Duration::from_secs((self.date_end - self.date_start).unsigned_abs())), chrono::Utc.timestamp_opt(self.date_end, 0).unwrap(), self.get_time_progress())
     }
 }
 
 impl std::str::FromStr for Work {
     type Err = serde_json::Error;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> { 
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         serde_json::from_str(s)
     }
 }
