@@ -7,8 +7,8 @@ use crate::terminal::MainSelect;
 use crate::work::WorkParams;
 
 fn main() {
-    let max_size: u8 = 10;
-    let mut vector = Vec::with_capacity(max_size as usize);
+    let max_size: usize = 10;
+    let mut vector = Vec::with_capacity(max_size);
 
     'main_loop: loop {
 
@@ -18,7 +18,12 @@ fn main() {
                 vector.push(Work::from_vec(work_params));
             }
             MainSelect::EditWork => {
-                //call work_edit terminal 
+                println!("There are {} works in the array.", vector.len());
+                let selected_work: usize = terminal::user_input("Select:");
+                let work  = vector.get_mut(selected_work).unwrap();
+                let change = terminal::input_edit_work_params();
+                
+                work.edit(change);
             }
             MainSelect::ExportWorks => {
                 println!("{}", terminal::export_works(&vector));

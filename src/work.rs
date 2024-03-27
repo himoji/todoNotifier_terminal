@@ -15,7 +15,7 @@ pub enum WorkParams {
     DateEnd(i64)
 }
 #[derive(serde::Serialize, serde::Deserialize)]
-pub struct Work{
+pub struct Work {
     name: String,
     desc: String,
     date_start: i64,
@@ -49,7 +49,7 @@ impl Work{
         }
         Work{name,desc,date_start, date_end}
     }
-    pub fn from_string(string: String) -> Work{
+    pub fn from_string(string: String) -> Work {
         serde_json::from_str(&string).unwrap()
     }
     pub fn to_json_string(&self) -> String {
@@ -77,5 +77,13 @@ impl Work{
 impl std::fmt::Display for Work {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "Name: {}\nDesc: {}\nStart: {}\nDuration: ~{} minutes\nEnd: {}\n", self.name, self.desc, chrono::Utc.timestamp_opt(self.date_start, 0).unwrap(), (self.date_end - self.date_start)/60, chrono::Utc.timestamp_opt(self.date_end, 0).unwrap())
+    }
+}
+
+impl std::str::FromStr for Work {
+    type Err = serde_json::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> { 
+        serde_json::from_str(s)
     }
 }
