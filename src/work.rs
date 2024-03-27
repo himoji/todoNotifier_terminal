@@ -8,7 +8,7 @@ Explanation:
 */
 
 use std::time::Duration;
-use chrono::TimeZone;
+use chrono::{TimeZone};
 
 pub enum WorkParams {
     Name(String), 
@@ -81,20 +81,20 @@ impl Work{
             }
         }
     }
-    
+
     pub fn get_time_progress(&self) -> u8 {
         //!Returns the percent of time passed
         if chrono::Utc::now().timestamp() <= self.date_start {0}
         else if chrono::Utc::now().timestamp() >= self.date_end {100}
         else {
-            return ((chrono::Utc::now().timestamp() - self.date_start) / self.date_end - self.date_start) as u8;
+            return (((chrono::Utc::now().timestamp() - self.date_start) as f64 / (self.date_end - self.date_start) as f64) * 100f64) as u8;
         }
     }
 }
 
 impl std::fmt::Display for Work {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "Name: {}\nDesc: {}\nStart: {}\nDuration: {}\nEnd: {}\nProgress by time passed: {}%\n", self.name, self.desc, chrono::Utc.timestamp_opt(self.date_start, 0).unwrap(), humantime::format_duration(Duration::from_secs((self.date_end - self.date_start).unsigned_abs())), chrono::Utc.timestamp_opt(self.date_end, 0).unwrap(), self.get_time_progress())
+        write!(f, "Name: {}\nDesc: {}\nStart: {}\nDuration: {}\nEnd: {}\nProgress by time passed: {}%\n", self.name, self.desc, chrono::Local.timestamp_opt(self.date_start, 0).unwrap(), humantime::format_duration(Duration::from_secs((self.date_end - self.date_start).unsigned_abs())), chrono::Local.timestamp_opt(self.date_end, 0).unwrap(), self.get_time_progress())
     }
 }
 
