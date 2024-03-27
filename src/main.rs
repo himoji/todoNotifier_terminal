@@ -26,11 +26,27 @@ fn main() {
                 work.edit(change);
             }
             MainSelect::ExportWorks => {
-                println!("{}", terminal::export_works(&vector));
+                let path_buf = terminal::user_input_path_buf();
+                terminal::export_works(&vector, path_buf);
             }
             MainSelect::PrintReadable => {
                 for work in &vector{
                     println!("{work}");
+                }
+            }
+            MainSelect::ImportFromJSON => {
+                let path_buf = terminal::user_input_path_buf();
+                
+                let file = file_work::read_file(path_buf.as_path());
+                
+                match file {
+                    Ok(s) => {
+                        vector.append(&mut Work::from_vec_string(s));
+                    }
+                    Err(e) => { 
+                        println!("Failed to import from JSON! {e}");
+                        continue 'main_loop
+                    }
                 }
             }
             MainSelect::Error => {

@@ -9,6 +9,7 @@ Explanation:
 
 use std::time::Duration;
 use chrono::TimeZone;
+
 pub enum WorkParams {
     Name(String), 
     Desc(String),
@@ -54,9 +55,9 @@ impl Work{
         }
         Work{name,desc,date_start, date_end}
     }
-    pub fn from_string(string: String) -> Work {
-        //!Parse from String
-        serde_json::from_str(&string).unwrap()
+    pub fn from_vec_string(string: String) -> Vec<Work> {
+        //!Parse from String Vec
+        serde_json::from_str(&string).map_err(|e| print!("Failed to convert into work: {e}")).unwrap()
     }
     pub fn to_json_string(&self) -> String {
         //!Converts work to json, return as String
@@ -86,7 +87,7 @@ impl Work{
         if chrono::Utc::now().timestamp() <= self.date_start {0}
         else if chrono::Utc::now().timestamp() >= self.date_end {100}
         else {
-            return ((chrono::Utc::now().timestamp() - self.date_start) / self.date_start - self.date_end) as u8;
+            return ((chrono::Utc::now().timestamp() - self.date_start) / self.date_end - self.date_start) as u8;
         }
     }
 }

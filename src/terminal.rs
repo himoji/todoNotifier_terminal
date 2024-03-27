@@ -1,7 +1,9 @@
+use std::path::PathBuf;
+use crate::file_work;
 use crate::work::{Work, WorkParams};
 
 pub enum MainSelect{
-    NewWork, EditWork, ExportWorks, PrintReadable,Error
+    NewWork, EditWork, ExportWorks, PrintReadable, ImportFromJSON, Error
 }
 
 pub fn user_select(string_show: &str) -> u8 {
@@ -28,13 +30,26 @@ pub fn user_input<T: std::str::FromStr>(string_show: &str) -> T {
     }
 }
 
+pub fn user_input_raw(string_show: &str) -> String {
+    println!("{}", string_show);
 
+    let mut input = String::new();
+    std::io::stdin().read_line(&mut input).expect("Failed to get user input");
+    
+    input
+}
+
+pub fn user_input_path_buf() -> std::path::PathBuf {
+    let input = user_input_raw("Path to JSON file: ");
+    std::path::PathBuf::from(input.trim())
+}
 pub fn select_print() -> MainSelect {
-    match user_select("Select:\n1)New work\n2)Edit work\n3)Export Year\n4)Print readable") {
+    match user_select("Select:\n1)New work\n2)Edit work\n3)Export Year\n4)Print readable\n5)Import from JSON") {
         1 => {MainSelect::NewWork},
         2 => {MainSelect::EditWork},
         3 => {MainSelect::ExportWorks},
         4 => {MainSelect::PrintReadable},
+        5 => {MainSelect::ImportFromJSON},
         _ => {MainSelect::Error}
     }
 }
@@ -80,12 +95,8 @@ pub fn input_edit_work_params() -> WorkParams {
     }
 }
 
-pub fn export_works(work_vec: &Vec<Work>) -> String {
-    let mut string = String::new();
-
-    for work in work_vec{
-        string.push_str(&work.to_json_string());
-    }
-
-    string
+pub fn export_works(work_vec: &Vec<Work>, path_buf: PathBuf) {
+    let string = serde_json::to_string(work_vec).expect("Failed to export works");
+    
+    file_work::write_into_file(path_buf.as_path(), string)
 }

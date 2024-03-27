@@ -1,6 +1,6 @@
 use std::env::current_dir;
 use std::fs;
-use std::fs::{create_dir_all, File};
+use std::fs::{create_dir_all, File, OpenOptions};
 use std::io::{Error, Write};
 use std::path::{Path, PathBuf};
 
@@ -19,7 +19,12 @@ pub fn create_file(path_buf: &Path, file_name: &str) -> Result<File, Error>{
     File::create(path_buf.join(file_name))
 }
 
-pub fn write_into_file(mut file: File, msg: String) {
+pub fn write_into_file(path_buf: &Path, msg: String) {
+    let mut file = OpenOptions::new()
+        .write(true)
+        .create(true)
+        .open(path_buf).expect("Failed to open the file");
+    
     file.write_all(msg.as_ref()).expect("idk how to write");
 }
 

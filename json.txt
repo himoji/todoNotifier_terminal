@@ -1,1 +1,1 @@
-[{"week_number":0,"week_year":2024,"monday":[{"name":"Study","desc":"Prepare for AP classes","start_time":1707233227,"duration":3600,"end_time":1707236827}],"tuesday":[],"wednesday":[],"thursday":[],"friday":[],"saturday":[],"sunday":[]}]
+[{"name":"weqwe","desc":"qwewqe","date_start":1711562605,"date_end":1711565605},{"name":"yhr","desc":"dfgghfgfdh","date_start":1711562444,"date_end":1711566605}]
