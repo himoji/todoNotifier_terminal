@@ -8,22 +8,22 @@ pub fn get_current_path() -> Result<PathBuf, Error> {
     current_dir()
 }
 
-pub fn create_dir(path_buf: PathBuf, dir_name: &str) -> Result<String, Error>{
+pub fn create_dir(path_buf: PathBuf, dir_name: &str) -> Result<(), Error>{
 
     match create_dir_all(path_buf.join(dir_name)) {
-        Ok(dir_path) => Ok(format!("Success! {dir_path:?}")),
+        Ok(dir_path) => Ok(dir_path),
         Err(e) => Err(e)
     }
 }
-pub fn create_file(path_buf: &Path, file_name: &str) -> Result<File, Error>{
-    File::create(path_buf.join(file_name))
+pub fn create_file(path: &Path, file_name: &str) -> Result<File, Error>{
+    File::create(path.join(file_name))
 }
 
-pub fn write_into_file(path_buf: &Path, msg: String) {
+pub fn write_into_file(path: &Path, msg: String) {
     let mut file = OpenOptions::new()
         .write(true)
         .create(true)
-        .open(path_buf).expect("Failed to open the file");
+        .open(path).expect("Failed to open the file");
     
     file.write_all(msg.as_ref()).expect("idk how to write");
 }
@@ -49,4 +49,12 @@ pub fn dir(path_buf: &Path) -> std::io::Result<Vec<PathBuf>> {
 
 pub fn read_file(path_buf: &Path) -> Result<String, Error>{
     fs::read_to_string(path_buf)
+}
+
+pub fn export_into_json(string: String) {
+    let curr_dir = get_current_path().expect("Can't get current dir!");
+    if create_dir(curr_dir.clone(), "saved_works").is_ok() {
+        let file_path = curr_dir.join("saved_works").join("saved.json");
+        write_into_file(file_path.as_path(), string);
+    };
 }

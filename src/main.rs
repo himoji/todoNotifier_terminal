@@ -26,8 +26,7 @@ fn main() {
                 work.edit(change);
             }
             MainSelect::ExportWorks => {
-                let path_buf = terminal::user_input_path_buf();
-                terminal::export_works(&vector, path_buf);
+                terminal::export_works(&vector);
             }
             MainSelect::PrintReadable => {
                 for work in &vector{

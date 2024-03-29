@@ -39,7 +39,7 @@ pub fn user_input_raw(string_show: &str) -> String {
     input
 }
 
-pub fn user_input_path_buf() -> std::path::PathBuf {
+pub fn user_input_path_buf() -> PathBuf {
     let input = user_input_raw("Path to JSON file: ");
     std::path::PathBuf::from(input.trim())
 }
@@ -95,8 +95,8 @@ pub fn input_edit_work_params() -> WorkParams {
     }
 }
 
-pub fn export_works(work_vec: &Vec<Work>, path_buf: PathBuf) {
+pub fn export_works(work_vec: &Vec<Work>) {
     let string = serde_json::to_string(work_vec).expect("Failed to export works");
-    
-    file_work::write_into_file(path_buf.as_path(), string)
+
+    file_work::export_into_json(string);
 }
