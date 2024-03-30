@@ -80,6 +80,8 @@ impl Work{
                 self.date_end = new_val;
             }
         }
+        
+        println!("\n{self}")
     }
 
     pub fn get_time_progress(&self) -> u8 {
