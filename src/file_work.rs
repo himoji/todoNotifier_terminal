@@ -9,11 +9,7 @@ pub fn get_current_path() -> Result<PathBuf, Error> {
 }
 
 pub fn create_dir(path_buf: PathBuf, dir_name: &str) -> Result<(), Error>{
-
-    match create_dir_all(path_buf.join(dir_name)) {
-        Ok(dir_path) => Ok(dir_path),
-        Err(e) => Err(e)
-    }
+    create_dir_all(path_buf.join(dir_name))
 }
 pub fn create_file(path: &Path, file_name: &str) -> Result<File, Error>{
     File::create(path.join(file_name))

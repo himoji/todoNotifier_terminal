@@ -4,53 +4,67 @@ mod terminal;
 
 use work::Work;
 use crate::terminal::MainSelect;
-use crate::work::WorkParams;
+
+const MAX_SIZE: usize = 10;
 
 fn main() {
-    let max_size: usize = 10;
-    let mut vector = Vec::with_capacity(max_size);
+    let mut vector: Vec<Work> = Vec::with_capacity(MAX_SIZE);
 
     'main_loop: loop {
-
         match terminal::select_print() {
             MainSelect::NewWork => {
-                let work_params: Vec<WorkParams> = terminal::input_create_work_params();
-                vector.push(Work::from_vec(work_params));
+                terminal::input_create_work_params()
+                    .and_then(|work_params| {
+                        vector.push(Work::from_vec(work_params));
+                        Ok(())
+                    }).expect("Failed to create the work");
             }
             MainSelect::EditWork => {
                 println!("There are {} works in the array.", vector.len());
-                let selected_work: usize = terminal::user_input("Select:");
-                let work  = vector.get_mut(selected_work).unwrap();
-                let change = terminal::input_edit_work_params();
                 
-                work.edit(change);
+                if let Ok(selected_work) = terminal::user_input::<usize>("Select:") {
+                    if selected_work < vector.len() {
+                        if let Some(work) = vector.get_mut(selected_work).map(|w| w as &mut Work)
+                            {
+                            terminal::input_edit_work_params()
+                                .and_then(|c| {
+                                    work.edit(c);
+                                    Ok(())
+                                }).expect("TODO: panic message");
+                            }
+                        }
+                }
             }
             MainSelect::ExportWorks => {
                 terminal::export_works(&vector);
             }
             MainSelect::PrintReadable => {
-                for work in &vector{
-                    println!("{work}");
+                for work in &vector {
+                    println!("{}", work);
                 }
             }
             MainSelect::ImportFromJSON => {
                 let path_buf = terminal::user_input_path_buf();
-                
-                let file = file_work::read_file(path_buf.as_path());
-                
-                match file {
-                    Ok(s) => {
-                        vector.append(&mut Work::from_vec_string(s));
+                if let Ok(add_works) = file_work::read_file(path_buf.as_path()).map(|add_work| Work::from_vec_string(add_work)) {
+                    vector.extend(add_works);
+                }
+                continue 'main_loop
+            }
+            MainSelect::ListFiles => {
+                if let Ok(current_dir) = file_work::get_current_path() {
+                    if let Ok(vec) = file_work::dir(current_dir.join("saved_works").as_path()) {
+                        for (index, path) in vec.iter().enumerate() {
+                            println!("#{}. {}", index, path.display());
+                        }
+                    } else {
+                        println!("Failed to get list of entries!");
                     }
-                    Err(e) => { 
-                        println!("Failed to import from JSON! {e}");
-                        continue 'main_loop
-                    }
+                } else {
+                    println!("Failed to get current path!");
                 }
             }
             MainSelect::Error => {
-                println!("Something went wrong!");
-                continue 'main_loop
+                println!("Wrong input!");
             }
         }
     }
