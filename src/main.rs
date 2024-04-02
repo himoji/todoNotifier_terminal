@@ -13,28 +13,21 @@ fn main() {
     'main_loop: loop {
         match terminal::select_print() {
             MainSelect::NewWork => {
-                terminal::input_create_work_params()
-                    .and_then(|work_params| {
-                        vector.push(Work::from_vec(work_params));
-                        Ok(())
-                    }).expect("Failed to create the work");
-            }
+                vector.push(Work::from_vec(terminal::input_create_work_params()));
+            },
+            
             MainSelect::EditWork => {
                 println!("There are {} works in the array.", vector.len());
                 
-                if let Ok(selected_work) = terminal::user_input::<usize>("Select:") {
-                    if selected_work < vector.len() {
-                        if let Some(work) = vector.get_mut(selected_work).map(|w| w as &mut Work)
-                            {
-                            terminal::input_edit_work_params()
-                                .and_then(|c| {
-                                    work.edit(c);
-                                    Ok(())
-                                }).expect("TODO: panic message");
-                            }
+                let selected_work = terminal::user_input::<usize>("Select:");
+                
+                if selected_work < vector.len() {
+                    if let Some(work) = vector.get_mut(selected_work).map(|w| w as &mut Work) {
+                            work.edit(terminal::input_edit_work_params());
                         }
+                    }
                 }
-            }
+            
             MainSelect::ExportWorks => {
                 terminal::export_works(&vector);
             }
@@ -51,7 +44,7 @@ fn main() {
                 continue 'main_loop
             }
             MainSelect::ListFiles => {
-                if let Ok(current_dir) = file_work::get_current_path() {
+                let current_dir = file_work::get_current_path_buf();
                     if let Ok(vec) = file_work::dir(current_dir.join("saved_works").as_path()) {
                         for (index, path) in vec.iter().enumerate() {
                             println!("#{}. {}", index, path.display());
@@ -59,9 +52,6 @@ fn main() {
                     } else {
                         println!("Failed to get list of entries!");
                     }
-                } else {
-                    println!("Failed to get current path!");
-                }
             }
             MainSelect::Error => {
                 println!("Wrong input!");
