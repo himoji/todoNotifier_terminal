@@ -2,6 +2,7 @@ mod file_work;
 mod work;
 mod terminal;
 
+use std::path::PathBuf;
 use work::Work;
 use crate::terminal::MainSelect;
 
@@ -19,7 +20,7 @@ fn main() {
             MainSelect::EditWork => {
                 println!("There are {} works in the array.", vector.len());
                 
-                let selected_work = terminal::user_input::<usize>("Select:");
+                let selected_work = terminal::user_input::<usize>("Select:") - 1;
                 
                 if selected_work < vector.len() {
                     if let Some(work) = vector.get_mut(selected_work).map(|w| w as &mut Work) {
@@ -37,17 +38,36 @@ fn main() {
                 }
             }
             MainSelect::ImportFromJSON => {
-                let path_buf = terminal::user_input_path_buf();
-                if let Ok(add_works) = file_work::read_file(path_buf.as_path()).map(|add_work| Work::from_vec_string(add_work)) {
-                    vector.extend(add_works);
+                let select = terminal::user_select("1)From custom path\n2)Default saved file");
+                match select { 
+                    1=>{
+                        let path_buf = terminal::user_input_path_buf();
+                        // let add_works = file_work::read_file(path_buf.as_path()).map(|add_work| Work::from_vec_string(add_work));
+                        let add_works = Work::from_vec_string(file_work::read_file(path_buf.as_path()));
+                        vector.extend(add_works);
+                    },
+                    2 => {
+                        let current_dir = file_work::get_current_path_buf();
+                        if let Ok(vec) = file_work::dir(current_dir.join("saved_works").as_path()) {
+                            for path in vec{
+                                if path.file_name().expect("Failed to find any saved files") == "saved.json" {
+                                    let add_works = Work::from_vec_string(file_work::read_file(path.as_path()));
+                                    vector.extend(add_works);
+                                }
+                            }
+                        } else {
+                            println!("Failed to get list of entries!");
+                        }
+                    }
+                    _ => {continue 'main_loop}
                 }
-                continue 'main_loop
+                
             }
             MainSelect::ListFiles => {
                 let current_dir = file_work::get_current_path_buf();
                     if let Ok(vec) = file_work::dir(current_dir.join("saved_works").as_path()) {
                         for (index, path) in vec.iter().enumerate() {
-                            println!("#{}. {}", index, path.display());
+                            println!("#{}. {}", index+1, path.display());
                         }
                     } else {
                         println!("Failed to get list of entries!");
@@ -55,6 +75,7 @@ fn main() {
             }
             MainSelect::Error => {
                 println!("Wrong input!");
+                continue 'main_loop;
             }
         }
     }

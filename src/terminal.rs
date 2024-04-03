@@ -54,11 +54,11 @@ pub fn user_input_raw(string_show: &str) -> String {
 pub fn user_input_path_buf() -> PathBuf {
     //!Gets path from user input
     loop {
-            let trimmed_input = user_input_raw("Path to JSON file: ").trim();
-                if trimmed_input.is_empty() {
+            let input = user_input_raw("Path to JSON file: ");
+                if input.trim().is_empty() {
                     println!("Empty input. Please provide a valid path.");
                 } else {
-                    return PathBuf::from(trimmed_input);
+                    return PathBuf::from(input.trim());
                 }
             }
         }

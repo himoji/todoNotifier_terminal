@@ -43,8 +43,8 @@ pub(crate) fn dir(path_buf: &Path) -> std::io::Result<Vec<PathBuf>> {
     Ok(entries)
 }
 
-pub fn read_file(path_buf: &Path) -> Result<String, Error>{
-    fs::read_to_string(path_buf)
+pub fn read_file(path_buf: &Path) -> String{
+    fs::read_to_string(path_buf).expect("Failed to read the file")
 }
 
 pub fn export_into_json(string: String) {
