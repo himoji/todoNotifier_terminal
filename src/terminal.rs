@@ -101,10 +101,10 @@ pub fn input_edit_work_params() -> WorkParams {
         let select = user_select("What param: \n1)Name\n2)Description\n3)Start time\n4)End time");
 
         match select {
-            1=> WorkParams::Name(user_input::<String>("New value:")),
-            2=> WorkParams::Desc(user_input::<String>("New value:")),
-            3=> WorkParams::DateStart(user_input::<i64>("New value:")),
-            4=> WorkParams::DateEnd(user_input::<i64>("New value:")),
+            1=> {return WorkParams::Name(user_input::<String>("New value:"))},
+            2=> {return WorkParams::Desc(user_input::<String>("New value:"))},
+            3=> {return WorkParams::DateStart(user_input::<i64>("New value:"))},
+            4=> {return WorkParams::DateEnd(user_input::<i64>("New value:"))},
 
             _ => {
                 println!("Invalid selection. Please select a valid option.");

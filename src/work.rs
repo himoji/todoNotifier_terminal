@@ -7,6 +7,7 @@ Explanation:
     date_end: Stands for task's/work's end DateTime in seconds
 */
 
+use std::ops::Add;
 use std::time::Duration;
 use chrono::{TimeZone};
 
@@ -92,11 +93,19 @@ impl Work{
             return (((chrono::Utc::now().timestamp() - self.date_start) as f64 / (self.date_end - self.date_start) as f64) * 100f64) as u8;
         }
     }
+    
+    pub fn get_time_progress_graph(&self) -> String {
+        let mut str = String::from("[");
+        str.push_str("I".repeat((self.get_time_progress()/2) as usize).as_str());
+        str.push_str(" ".repeat((50 - self.get_time_progress()/2) as usize).as_str());
+        str.push(']');
+        str
+    }
 }
 
 impl std::fmt::Display for Work {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "Name: {}\nDesc: {}\nStart: {}\nDuration: {}\nEnd: {}\nProgress by time passed: {}%\n", self.name, self.desc, chrono::Local.timestamp_opt(self.date_start, 0).unwrap(), humantime::format_duration(Duration::from_secs((self.date_end - self.date_start).unsigned_abs())), chrono::Local.timestamp_opt(self.date_end, 0).unwrap(), self.get_time_progress())
+        write!(f, "Name: {}\nDesc: {}\nStart: {}\nDuration: {}\nEnd: {}\nProgress by time passed: {}%\n{}\n", self.name, self.desc, chrono::Local.timestamp_opt(self.date_start, 0).unwrap(), humantime::format_duration(Duration::from_secs((self.date_end - self.date_start).unsigned_abs())), chrono::Local.timestamp_opt(self.date_end, 0).unwrap(), self.get_time_progress(), self.get_time_progress_graph())
     }
 }
 

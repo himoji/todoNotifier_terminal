@@ -41,7 +41,6 @@ fn main() {
                 match select { 
                     1=>{
                         let path_buf = terminal::user_input_path_buf();
-                        // let add_works = file_work::read_file(path_buf.as_path()).map(|add_work| Work::from_vec_string(add_work));
                         let add_works = Work::from_vec_string(file_work::read_file(path_buf.as_path()));
                         vector.extend(add_works);
                     },
