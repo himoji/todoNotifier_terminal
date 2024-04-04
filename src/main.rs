@@ -2,7 +2,6 @@ mod file_work;
 mod work;
 mod terminal;
 
-use std::path::PathBuf;
 use work::Work;
 use crate::terminal::MainSelect;
 
