@@ -7,7 +7,6 @@ Explanation:
     date_end: Stands for task's/work's end DateTime in seconds
 */
 
-use std::ops::Add;
 use std::time::Duration;
 use chrono::{TimeZone};
 
@@ -17,7 +16,7 @@ pub enum WorkParams {
     DateStart(i64),
     DateEnd(i64)
 }
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct Work {
     name: String,
     desc: String,
