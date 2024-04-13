@@ -19,8 +19,9 @@ pub fn write_into_file(path: &Path, msg: String) {
     let mut file = OpenOptions::new()
         .write(true)
         .create(true)
-        .open(path).expect("Failed to open the file");
-    
+        .open(path)
+        .expect("Failed to open the file");
+
     file.write_all(msg.as_ref()).expect("idk how to write");
 }
 
@@ -43,13 +44,13 @@ pub(crate) fn dir(path_buf: &Path) -> std::io::Result<Vec<PathBuf>> {
     Ok(entries)
 }
 
-pub fn read_file(path_buf: &Path) -> String{
+pub fn read_file(path_buf: &Path) -> String {
     fs::read_to_string(path_buf).expect("Failed to read the file")
 }
 
 pub fn export_into_json(string: String) {
     let curr_dir = get_current_path_buf();
     create_dir(curr_dir.clone(), "saved_works");
-    let file_path = curr_dir.join("../../saved_works").join("saved.json");
+    let file_path = curr_dir.join("saved_works/").join("saved.json");
     write_into_file(file_path.as_path(), string);
 }

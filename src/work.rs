@@ -8,7 +8,9 @@ Explanation:
 */
 
 use std::time::Duration;
-use chrono::{TimeZone};
+
+use chrono::TimeZone;
+
 #[derive(Debug)]
 pub enum WorkParams {
     Name(String), 
@@ -16,7 +18,7 @@ pub enum WorkParams {
     DateStart(i64),
     DateEnd(i64)
 }
-#[derive(serde::Serialize, serde::Deserialize, Debug)]
+#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
 pub struct Work {
     pub name: String,
     pub desc: String,

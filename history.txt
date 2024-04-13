@@ -1,0 +1,5 @@
+#V2
+use ns tst;
+use ns test;
+use db test;
+select * from work;
