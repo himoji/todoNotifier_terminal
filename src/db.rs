@@ -1,37 +1,52 @@
 use serde::{Deserialize, Serialize};
-use surrealdb::{Surreal};
-use surrealdb::engine::remote::ws::Ws;
-use crate::work::Work;
+use surrealdb::engine::remote::ws::{Client};
+use surrealdb::sql::Thing;
+use surrealdb::Surreal;
+use crate::work::{Work, WorkParams};
 
 #[derive(Deserialize, Serialize, Debug)]
 struct UserData {
-    user_id: i32,
-    work_vec: Vec<Work>
+    id: Thing,
 }
 
-#[tokio::main]
-pub async fn main() -> surrealdb::Result<()>{
-    let db = Surreal::new::<Ws>("0.0.0.0:8000").await?;
+#[derive(Deserialize, Serialize, Debug)]
+struct DBWork {
+    name: String,
+    desc: String,
+    date_start: String,
+    date_end: String,
+}
+impl DBWork{
+    pub fn from_work(work: Work) -> DBWork {
+        DBWork {
+            name: work.name,
+            desc: work.desc,
+            date_start: work.date_start.to_string(),
+            date_end: work.date_end.to_string(),
+        }
+    }
+}
 
-    db.use_ns("test").use_db("test").await?;
 
-    let created: Vec<UserData> = db
-        .create("userdata")
-        .content(UserData {
-            user_id: 1,
-            work_vec: vec![Work::new(), Work::new()]
-        })
-        .await?;
+pub async fn add_work(db: &Surreal<Client>, name: String, desc: String, date_start: i64, date_end: i64) -> surrealdb::Result<()> {
+    let created: Vec<UserData> = db.
+        create("work")
+        .content(DBWork::from_work(Work::from(name, desc, date_start, date_end))).await?;
     dbg!(created);
-
-    let people: Vec<UserData> = db.select("userdata").await?;
-    dbg!(people);
-
-    let groups = db
-        .query("SELECT * FROM userdata")
-        .await?;
-    dbg!(groups);
-
     Ok(())
+}
+
+pub async fn add_work_vec(db: &Surreal<Client>, params: Vec<WorkParams>) -> surrealdb::Result<()> {
+    let created: Vec<UserData> = db.
+        create("work")
+        .content(DBWork::from_work(Work::from_vec(params).expect("Failed to create work from vec!"))).await?;
+    dbg!(created);
+    Ok(())
+}
+
+pub async fn select_all_works(db: &Surreal<Client>) -> surrealdb::Result<()> {
+    let selected: Vec<UserData> = db.select("work").await?;
+    dbg!(selected);
     
+    Ok(())
 }

@@ -9,7 +9,7 @@ Explanation:
 
 use std::time::Duration;
 use chrono::{TimeZone};
-
+#[derive(Debug)]
 pub enum WorkParams {
     Name(String), 
     Desc(String),
@@ -18,10 +18,10 @@ pub enum WorkParams {
 }
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
 pub struct Work {
-    name: String,
-    desc: String,
-    date_start: i64,
-    date_end: i64
+    pub name: String,
+    pub desc: String,
+    pub date_start: i64,
+    pub date_end: i64
 }
 
 impl Work{
@@ -38,7 +38,7 @@ impl Work{
         //!Creates work with specified params
         Work{name, desc, date_start, date_end}
     }
-    pub fn from_vec(vec: Vec<WorkParams>) -> Work {
+    pub fn from_vec(vec: Vec<WorkParams>) -> Option<Work> {
         //!Parse from vector of works aka Vec< Work >
         //!Iteration through all items in vector
         let mut name= String::new();
@@ -53,7 +53,11 @@ impl Work{
                 WorkParams::DateEnd(i) => {date_end = i;}
             }
         }
-        Work{name,desc,date_start, date_end}
+        if name.is_empty() || desc.is_empty() || date_start==0 || date_end==0 {
+            None
+        } else {
+            Some(Work { name, desc, date_start, date_end })
+        }
     }
     pub fn from_vec_string(string: String) -> Vec<Work> {
         //!Parse from String Vec

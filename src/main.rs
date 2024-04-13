@@ -3,7 +3,8 @@ mod work;
 mod terminal;
 mod db;
 
-use std::thread;
+use surrealdb::engine::remote::ws::Ws;
+use surrealdb::Surreal;
 use work::Work;
 use terminal::MainSelect;
 
@@ -15,7 +16,7 @@ let mut vector: Vec<Work> = Vec::with_capacity(MAX_SIZE);
 'main_loop: loop {
 match terminal::select_print() {
 MainSelect::NewWork => {
-vector.push(Work::from_vec(terminal::input_create_work_params()));
+vector.push(Work::from_vec(terminal::input_create_work_params()).expect("From vec is empty"));
 },
 
 MainSelect::EditWork => {
@@ -81,15 +82,18 @@ continue 'main_loop;
 }
 }
 
-fn main_db() {
-    let _ = db::main();
-}
-fn main() {
-    // thread::spawn(|| {
-    //     main_terminal();
-    // });
-    thread::spawn(|| {
-            main_db();
-        });
+#[tokio::main]
+async fn main() -> surrealdb::Result<()>{
+    let db = Surreal::new::<Ws>("127.0.0.1:8000").await?;
+
+    db.use_ns("test").use_db("test").await?;
+    
+    let query = terminal::input_create_work_params();
+
+    db::add_work_vec(&db, query).await?;
+    println!("now select!");
+    db::select_all_works(&db).await?;
+    
+    Ok(())
     
 }
