@@ -1,11 +1,18 @@
-use std::path::PathBuf;
-use crate::file_work;
-use crate::work::{Work, WorkParams};
-use std::io::{self, Write};
 use std::error::Error;
+use std::io::{self, Write};
+use std::path::PathBuf;
 
-pub enum MainSelect{
-    NewWork, EditWork, ExportWorks, PrintReadable, ImportFromJSON, ListFiles, Error
+use crate::{file_work, time_work};
+use crate::work::{Work, WorkParams};
+
+pub enum MainSelect {
+    NewWork,
+    EditWork,
+    ExportWorks,
+    PrintReadable,
+    ImportFromJSON,
+    ListFiles,
+    Error,
 }
 
 pub fn user_select(string_show: &str) -> u8 {
@@ -16,16 +23,19 @@ pub fn user_select(string_show: &str) -> u8 {
     select
 }
 
-
 pub fn user_input<T>(string_show: &str) -> T
-    where
-        T: std::str::FromStr,
-        <T as std::str::FromStr>::Err: Error{
+where
+    T: std::str::FromStr,
+    <T as std::str::FromStr>::Err: Error,
+{
     //!Prints string_show and returns parsed value in <T> type
 
     let input = user_input_raw(string_show);
 
-    input.trim().parse::<T>().expect("Failed to parse to needed type") // Convert parse error into a Box<dyn Error>
+    input
+        .trim()
+        .parse::<T>()
+        .expect("Failed to parse to needed type") // Convert parse error into a Box<dyn Error>
 }
 
 pub fn user_input_raw(string_show: &str) -> String {
@@ -35,7 +45,9 @@ pub fn user_input_raw(string_show: &str) -> String {
     let mut input = String::new();
     loop {
         io::stdout().flush().expect("Failed to flush io::out"); // Ensure prompt is displayed before user input
-        io::stdin().read_line(&mut input).expect("Failed to read line");
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read line");
 
         // Trim whitespace from the input
         let input = input.trim();
@@ -54,14 +66,14 @@ pub fn user_input_raw(string_show: &str) -> String {
 pub fn user_input_path_buf() -> PathBuf {
     //!Gets path from user input
     loop {
-            let input = user_input_raw("Path to JSON file: ");
-                if input.trim().is_empty() {
-                    println!("Empty input. Please provide a valid path.");
-                } else {
-                    return PathBuf::from(input.trim());
-                }
-            }
+        let input = user_input_raw("Path to JSON file: ");
+        if input.trim().is_empty() {
+            println!("Empty input. Please provide a valid path.");
+        } else {
+            return PathBuf::from(input.trim());
         }
+    }
+}
 pub fn select_print() -> MainSelect {
     //!Main select function.
 
@@ -76,7 +88,6 @@ pub fn select_print() -> MainSelect {
             MainSelect::Error
         }
     }
-
 }
 
 pub fn input_create_work_params() -> Vec<WorkParams> {
@@ -84,8 +95,13 @@ pub fn input_create_work_params() -> Vec<WorkParams> {
 
     let name = user_input("Type work's name: ");
     let desc = user_input("Type work's description: ");
-    let start_time = user_input("Type work's start_time: ");
-    let end_time = user_input("Type work's end_time: ");
+    let start_time: i64 = time_work::time_parser(user_input(
+        "Type work's start time (e.g. 1241252516, now, in 1h, in 1m, in 1h;1m): ",
+    ));
+
+    let end_time: i64 = time_work::time_parser(user_input(
+        "Type work's end time (e.g. 1241252516, now, in 1h, in 1m, in 1h;1m): ",
+    ));
 
     vec![
         WorkParams::Name(name),
@@ -101,10 +117,10 @@ pub fn input_edit_work_params() -> WorkParams {
         let select = user_select("What param: \n1)Name\n2)Description\n3)Start time\n4)End time");
 
         match select {
-            1=> {return WorkParams::Name(user_input::<String>("New value:"))},
-            2=> {return WorkParams::Desc(user_input::<String>("New value:"))},
-            3=> {return WorkParams::DateStart(user_input::<i64>("New value:"))},
-            4=> {return WorkParams::DateEnd(user_input::<i64>("New value:"))},
+            1 => return WorkParams::Name(user_input::<String>("New value:")),
+            2 => return WorkParams::Desc(user_input::<String>("New value:")),
+            3 => return WorkParams::DateStart(user_input::<i64>("New value:")),
+            4 => return WorkParams::DateEnd(user_input::<i64>("New value:")),
 
             _ => {
                 println!("Invalid selection. Please select a valid option.");
@@ -113,8 +129,6 @@ pub fn input_edit_work_params() -> WorkParams {
         };
     }
 }
-
-
 
 pub fn export_works(work_vec: &Vec<Work>) {
     //!Exports work vector into json file

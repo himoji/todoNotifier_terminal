@@ -1,14 +1,14 @@
 [package]
 name = "todo_term"
-version = "2.3.0"
+version = "2.4.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-chrono = "0.4.37"
-serde_json = "1.0.115"
-serde = { version = "1.0.197", features = ["derive"] }
-humantime = "2.1.0"
-surrealdb = "1.3.1"
-tokio = "1.37.0"
+chrono = "*"
+serde_json = "*"
+serde = { version = "*", features = ["derive"] }
+humantime = "*"
+surrealdb = "1.4.0"
+tokio = "*"

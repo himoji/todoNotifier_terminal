@@ -6,7 +6,9 @@ use work::Work;
 
 mod db;
 mod file_work;
+mod string_work;
 mod terminal;
+mod time_work;
 mod work;
 
 const MAX_SIZE: usize = 10;
@@ -89,9 +91,18 @@ async fn main_terminal(db: &Surreal<Client>) {
             }
             MainSelect::ListFiles => {
                 let current_dir = file_work::get_current_path_buf();
-                if let Ok(vec) = file_work::dir(current_dir.join("../../saved_works").as_path()) {
+                if let Ok(vec) = file_work::dir(current_dir.join("saved_works").as_path()) {
                     for (index, path) in vec.iter().enumerate() {
                         println!("#{}. {}", index + 1, path.display());
+                    }
+                    dbg!(&vec);
+                    let path = vec
+                        .get((terminal::user_select("Which one do you want to use?") - 1) as usize)
+                        .expect("Failed to get this path");
+
+                    if path.file_name().expect("Failed to find any saved files") == "saved.json" {
+                        let add_works = Work::from_vec_string(file_work::read_file(path.as_path()));
+                        vector.extend(add_works);
                     }
                 } else {
                     println!("Failed to get list of entries!");
