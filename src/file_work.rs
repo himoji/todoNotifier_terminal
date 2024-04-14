@@ -11,6 +11,8 @@ pub fn get_current_path_buf() -> PathBuf {
 pub fn create_dir(path_buf: PathBuf, dir_name: &str) {
     create_dir_all(path_buf.join(dir_name)).expect("Failed to create a new dir")
 }
+
+#[allow(dead_code)]
 pub fn create_file(path: &Path, file_name: &str) -> File {
     File::create(path.join(file_name)).expect("Failed to create a new file")
 }
@@ -24,7 +26,7 @@ pub fn write_into_file(path: &Path, msg: String) {
 
     file.write_all(msg.as_ref()).expect("idk how to write");
 }
-
+#[allow(dead_code)]
 pub fn delete_file(path_buf: &Path) {
     fs::remove_file(path_buf).expect("idk how to delete");
 }

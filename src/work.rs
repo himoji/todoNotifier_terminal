@@ -7,29 +7,31 @@ Explanation:
     date_end: Stands for task's/work's end DateTime in seconds
 */
 
+use std::collections::HashSet;
 use std::time::Duration;
 
 use chrono::TimeZone;
 
 #[derive(Debug)]
 pub enum WorkParams {
-    Name(String), 
+    Name(String),
     Desc(String),
     DateStart(i64),
-    DateEnd(i64)
+    DateEnd(i64),
 }
-#[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, Hash, Eq, PartialEq, Debug, Clone)]
 pub struct Work {
     pub name: String,
     pub desc: String,
     pub date_start: i64,
-    pub date_end: i64
+    pub date_end: i64,
 }
 
-impl Work{
+impl Work {
+    #[allow(dead_code)]
     pub fn new() -> Work {
         //!Creates default empty work
-        Work{
+        Work {
             name: "".to_string(),
             desc: "".to_string(),
             date_start: 0,
@@ -38,41 +40,92 @@ impl Work{
     }
     pub fn from(name: String, desc: String, date_start: i64, date_end: i64) -> Work {
         //!Creates work with specified params
-        Work{name, desc, date_start, date_end}
+        Work {
+            name,
+            desc,
+            date_start,
+            date_end,
+        }
+    }
+
+    #[allow(dead_code)]
+    pub fn from_hashset(hashset: HashSet<Work>) -> Vec<Work> {
+        //!O(n); HashSet< Work > to Vec< Work >
+        let mut vec: Vec<Work> = Vec::new();
+        for work in hashset {
+            vec.push(work);
+        }
+        vec
+    }
+
+    #[allow(dead_code)]
+    pub fn vec_to_hashset_work(vec: Vec<Work>) -> HashSet<Work> {
+        vec.into_iter().collect()
+    }
+
+    #[allow(dead_code)]
+    pub fn filter_duplicates(vec: Vec<Work>) -> Vec<Work> {
+        //! Filters duplicates using HashSet [1,2,2,3] to [1,2,3]
+        Self::from_hashset(Self::vec_to_hashset_work(vec))
+    }
+
+    pub fn remove_duplicates(old_vec: Vec<Work>, mut new_vec: Vec<Work>) -> Vec<Work> {
+        //! Deletes duplicates using retain [1,2,2,3] to [1,3]
+        new_vec.retain(|work| !old_vec.contains(work));
+        new_vec
     }
     pub fn from_vec(vec: Vec<WorkParams>) -> Option<Work> {
         //!Parse from vector of works aka Vec< Work >
         //!Iteration through all items in vector
-        let mut name= String::new();
-        let mut desc= String::new();
+        let mut name = String::new();
+        let mut desc = String::new();
         let mut date_start = 0;
-        let mut date_end= 0;
+        let mut date_end = 0;
         for i in vec {
             match i {
-                WorkParams::Name(s) => {name = s;}
-                WorkParams::Desc(s) => {desc = s;}
-                WorkParams::DateStart(i) => {date_start = i;}
-                WorkParams::DateEnd(i) => {date_end = i;}
+                WorkParams::Name(s) => {
+                    name = s;
+                }
+                WorkParams::Desc(s) => {
+                    desc = s;
+                }
+                WorkParams::DateStart(i) => {
+                    date_start = i;
+                }
+                WorkParams::DateEnd(i) => {
+                    date_end = i;
+                }
             }
         }
-        if name.is_empty() || desc.is_empty() || date_start==0 || date_end==0 {
+        if name.is_empty() || desc.is_empty() || date_start == 0 || date_end == 0 {
             None
         } else {
-            Some(Work { name, desc, date_start, date_end })
+            Some(Work {
+                name,
+                desc,
+                date_start,
+                date_end,
+            })
         }
     }
     pub fn from_vec_string(string: String) -> Vec<Work> {
         //!Parse from String Vec
-        serde_json::from_str(&string).map_err(|e| print!("Failed to convert into work: {e}")).unwrap()
+        serde_json::from_str(&string)
+            .map_err(|e| print!("Failed to convert into work: {e}"))
+            .unwrap()
     }
+
+    #[allow(dead_code)]
     pub fn to_json_string(&self) -> String {
         //!Converts work to json, return as String
-        serde_json::to_string(&self).map_err(|e| print!("Failed to convert into string: {e}")).unwrap()
+        serde_json::to_string(&self)
+            .map_err(|e| print!("Failed to convert into string: {e}"))
+            .unwrap()
     }
-    
+
     pub fn edit(&mut self, param: WorkParams) {
         //!Edits specified param
-        match param{
+        match param {
             WorkParams::Name(new_val) => {
                 self.name = new_val;
             }
@@ -80,29 +133,36 @@ impl Work{
                 self.desc = new_val;
             }
             WorkParams::DateStart(new_val) => {
-                self.date_start= new_val;
+                self.date_start = new_val;
             }
-            WorkParams::DateEnd(new_val)=> {
+            WorkParams::DateEnd(new_val) => {
                 self.date_end = new_val;
             }
         }
-        
+
         println!("\n{self}")
     }
 
     pub fn get_time_progress(&self) -> u8 {
         //!Returns the percent of time passed
-        if chrono::Utc::now().timestamp() <= self.date_start {0}
-        else if chrono::Utc::now().timestamp() >= self.date_end {100}
-        else {
-            return (((chrono::Utc::now().timestamp() - self.date_start) as f64 / (self.date_end - self.date_start) as f64) * 100f64) as u8;
+        if chrono::Utc::now().timestamp() <= self.date_start {
+            0
+        } else if chrono::Utc::now().timestamp() >= self.date_end {
+            100
+        } else {
+            return (((chrono::Utc::now().timestamp() - self.date_start) as f64
+                / (self.date_end - self.date_start) as f64)
+                * 100f64) as u8;
         }
     }
-    
+
     pub fn get_time_progress_graph(&self) -> String {
         let mut str = String::from("[");
-        str.push_str("I".repeat((self.get_time_progress()/2) as usize).as_str());
-        str.push_str(" ".repeat((50 - self.get_time_progress()/2) as usize).as_str());
+        str.push_str("I".repeat((self.get_time_progress() / 2) as usize).as_str());
+        str.push_str(
+            " ".repeat((50 - self.get_time_progress() / 2) as usize)
+                .as_str(),
+        );
         str.push(']');
         str
     }

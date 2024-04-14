@@ -3,3 +3,17 @@ use ns tst;
 use ns test;
 use db test;
 select * from work;
+use ns testl;
+use ns test;
+use db test;
+select * from work;
+select * from work where id = work:lx96msv1871la862pstl;
+delete work;
+select * from work;
+cls
+s
+ss
+s
+select * from work;
+delete work;
+select * from work;

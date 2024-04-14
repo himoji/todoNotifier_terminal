@@ -37,9 +37,20 @@ async fn main_terminal(db: &Surreal<Client>) {
 
             MainSelect::ExportWorks => {
                 terminal::export_works(&vector);
-                db::add_works_vec(db, &vector)
-                    .await
-                    .expect("Failed to commit to db!");
+                let select = terminal::user_select("1)Export all\n2)Filter and export");
+                match select {
+                    1 => {
+                        db::add_works_vec(db, vector.clone())
+                            .await
+                            .expect("Failed to commit to db!");
+                    }
+                    2 => {
+                        db::add_filter_works_vec(db, vector.clone())
+                            .await
+                            .expect("Failed to commit to db!");
+                    }
+                    _ => continue 'main_loop,
+                }
             }
             MainSelect::PrintReadable => {
                 for work in &vector {
