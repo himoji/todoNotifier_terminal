@@ -2,8 +2,8 @@ use std::error::Error;
 use std::io::{self, Write};
 use std::path::PathBuf;
 
-use crate::{file_work, time_work};
 use crate::work::{Work, WorkParams};
+use crate::{file_work, time_work};
 
 pub enum MainSelect {
     NewWork,
@@ -130,9 +130,15 @@ pub fn input_edit_work_params() -> WorkParams {
     }
 }
 
-pub fn export_works(work_vec: &Vec<Work>) {
+pub fn export_works(work_vec: Vec<Work>) {
     //!Exports work vector into json file
-    let string = serde_json::to_string(work_vec).expect("Failed to export works");
+    let mut old_works = Work::from_vec_string(file_work::read_file(
+        file_work::get_export_json_loc().as_path(),
+    ));
+    old_works.extend(work_vec);
+
+    let string =
+        serde_json::to_string(&old_works).expect("Failed to convert all works into string");
 
     file_work::export_into_json(string);
 }

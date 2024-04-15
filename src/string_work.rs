@@ -1,9 +1,9 @@
-pub fn extract_number(text: &str) -> Option<i16> {
+pub fn extract_number(text: &str) -> Option<i64> {
     let mut number = String::new();
     let mut found_number = false;
 
     for c in text.chars() {
-        if c.is_digit(10) {
+        if c.is_ascii_digit() {
             found_number = true;
             number.push(c);
         } else if found_number {

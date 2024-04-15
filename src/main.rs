@@ -38,7 +38,7 @@ async fn main_terminal(db: &Surreal<Client>) {
             }
 
             MainSelect::ExportWorks => {
-                terminal::export_works(&vector);
+                terminal::export_works(vector.clone());
                 let select = terminal::user_select("1)Export all\n2)Filter and export");
                 match select {
                     1 => {

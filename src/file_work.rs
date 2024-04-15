@@ -54,5 +54,12 @@ pub fn export_into_json(string: String) {
     let curr_dir = get_current_path_buf();
     create_dir(curr_dir.clone(), "saved_works");
     let file_path = curr_dir.join("saved_works/").join("saved.json");
+    
     write_into_file(file_path.as_path(), string);
+}
+
+pub fn get_export_json_loc() -> PathBuf {
+    let curr_dir = get_current_path_buf();
+    create_dir(curr_dir.clone(), "saved_works");
+    curr_dir.join("saved_works/").join("saved.json")
 }

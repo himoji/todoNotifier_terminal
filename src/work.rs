@@ -111,16 +111,15 @@ impl Work {
     pub fn from_vec_string(string: String) -> Vec<Work> {
         //!Parse from String Vec
         serde_json::from_str(&string)
-            .map_err(|e| print!("Failed to convert into work: {e}"))
-            .unwrap()
+            .map_err(|e| println!("Failed to convert into work: {e}"))
+            .expect("")
     }
 
     #[allow(dead_code)]
     pub fn to_json_string(&self) -> String {
         //!Converts work to json, return as String
-        serde_json::to_string(&self)
-            .map_err(|e| print!("Failed to convert into string: {e}"))
-            .unwrap()
+
+        serde_json::to_string(self).expect("Failed to convert into work")
     }
 
     pub fn edit(&mut self, param: WorkParams) {
