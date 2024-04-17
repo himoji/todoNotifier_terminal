@@ -38,15 +38,16 @@ async fn main_terminal(db: &Surreal<Client>) {
             }
 
             MainSelect::ExportWorks => {
-                terminal::export_works(vector.clone());
                 let select = terminal::user_select("1)Export all\n2)Filter and export");
                 match select {
                     1 => {
+                        terminal::export_works(vector.clone());
                         db::add_works_vec(db, vector.clone())
                             .await
                             .expect("Failed to commit to db!");
                     }
                     2 => {
+                        terminal::export_filter_works(vector.clone());
                         db::add_filter_works_vec(db, vector.clone())
                             .await
                             .expect("Failed to commit to db!");
@@ -70,16 +71,12 @@ async fn main_terminal(db: &Surreal<Client>) {
                     }
                     2 => {
                         let current_dir = file_work::get_current_path_buf();
-                        if let Ok(vec) =
-                            file_work::dir(current_dir.join("saved_works/saved.json").as_path())
-                        {
+                        if let Ok(vec) = file_work::dir(current_dir.join("saved_works").as_path()) {
                             for path in vec {
                                 if path.file_name().expect("Failed to find any saved files")
                                     == "saved.json"
                                 {
-                                    let add_works =
-                                        Work::from_vec_string(file_work::read_file(path.as_path()));
-                                    vector.extend(add_works);
+                                    terminal::import_from_default(path.as_path(), &mut vector);
                                 }
                             }
                         } else {
@@ -100,10 +97,7 @@ async fn main_terminal(db: &Surreal<Client>) {
                         .get((terminal::user_select("Which one do you want to use?") - 1) as usize)
                         .expect("Failed to get this path");
 
-                    if path.file_name().expect("Failed to find any saved files") == "saved.json" {
-                        let add_works = Work::from_vec_string(file_work::read_file(path.as_path()));
-                        vector.extend(add_works);
-                    }
+                    terminal::import_from_default(path.as_path(), &mut vector);
                 } else {
                     println!("Failed to get list of entries!");
                 }

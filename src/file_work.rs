@@ -17,13 +17,15 @@ pub fn create_file(path: &Path, file_name: &str) -> File {
     File::create(path.join(file_name)).expect("Failed to create a new file")
 }
 
-pub fn write_into_file(path: &Path, msg: String) {
+pub fn file_empty_then_write(path: &Path, msg: String) {
     let mut file = OpenOptions::new()
         .write(true)
         .create(true)
         .open(path)
         .expect("Failed to open the file");
 
+    file.set_len(0).expect("Failed to empty the file");
+    file.flush().expect("Failed to flush the file");
     file.write_all(msg.as_ref()).expect("idk how to write");
 }
 #[allow(dead_code)]
@@ -54,8 +56,8 @@ pub fn export_into_json(string: String) {
     let curr_dir = get_current_path_buf();
     create_dir(curr_dir.clone(), "saved_works");
     let file_path = curr_dir.join("saved_works/").join("saved.json");
-    
-    write_into_file(file_path.as_path(), string);
+
+    file_empty_then_write(file_path.as_path(), string);
 }
 
 pub fn get_export_json_loc() -> PathBuf {

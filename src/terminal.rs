@@ -1,9 +1,9 @@
 use std::error::Error;
 use std::io::{self, Write};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
-use crate::work::{Work, WorkParams};
 use crate::{file_work, time_work};
+use crate::work::{Work, WorkParams};
 
 pub enum MainSelect {
     NewWork,
@@ -141,4 +141,25 @@ pub fn export_works(work_vec: Vec<Work>) {
         serde_json::to_string(&old_works).expect("Failed to convert all works into string");
 
     file_work::export_into_json(string);
+}
+
+pub fn export_filter_works(work_vec: Vec<Work>) {
+    //!Exports work vector into json file
+    let mut old_works = Work::from_vec_string(file_work::read_file(
+        file_work::get_export_json_loc().as_path(),
+    ));
+    old_works.extend(work_vec);
+
+    let string = serde_json::to_string(&Work::filter_duplicates(old_works))
+        .expect("Failed to convert all works into string");
+
+    file_work::export_into_json(string);
+}
+
+pub fn import_from_default(path: &Path, vector: &mut Vec<Work>) {
+    if path.file_name().expect("Failed to find any saved files") == "saved.json" {
+        let add_works = Work::from_vec_string(file_work::read_file(path));
+        vector.extend(add_works);
+        println!("Imported successfully");
+    }
 }

@@ -17,3 +17,9 @@ s
 select * from work;
 delete work;
 select * from work;
+use ns test;
+use db test;
+select * from work;
+use ns test;
+use db test;
+select * from work;

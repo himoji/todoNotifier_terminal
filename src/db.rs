@@ -40,15 +40,18 @@ pub async fn add_work_params_vec(
 }
 
 pub async fn add_filter_works_vec(db: &Surreal<Client>, vec: Vec<Work>) -> surrealdb::Result<()> {
-    let mut resp = db.query("select * from work").await?;
-    let old_vec: Vec<Work> = resp.take(0)?;
-
-    let a = Work::remove_duplicates(old_vec, vec);
+    let a = Work::remove_duplicates(get_all_works(db).await?, vec);
     dbg!(&a);
 
     add_works_vec(db, a).await?;
 
     Ok(())
+}
+
+pub async fn get_all_works(db: &Surreal<Client>) -> surrealdb::Result<Vec<Work>> {
+    let mut resp = db.query("select * from work").await?;
+    let old_vec: Vec<Work> = resp.take(0)?;
+    Ok(old_vec)
 }
 
 pub async fn add_works_vec(db: &Surreal<Client>, vec: Vec<Work>) -> surrealdb::Result<()> {
