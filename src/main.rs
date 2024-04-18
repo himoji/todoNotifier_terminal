@@ -38,7 +38,7 @@ async fn main_terminal(db: &Surreal<Client>) {
             }
 
             MainSelect::ExportWorks => {
-                let select = terminal::user_select("1)Export all\n2)Filter and export");
+                let select = terminal::user_select(vec!["Export all", "Filter and export"]);
                 match select {
                     1 => {
                         terminal::export_works(vector.clone());
@@ -61,7 +61,11 @@ async fn main_terminal(db: &Surreal<Client>) {
                 }
             }
             MainSelect::ImportFromJSON => {
-                let select = terminal::user_select("1)From custom path\n2)Default saved file");
+                let select = terminal::user_select(vec![
+                    "From custom path",
+                    "Default saved file",
+                    "From the database",
+                ]);
                 match select {
                     1 => {
                         let path_buf = terminal::user_input_path_buf();
@@ -83,18 +87,20 @@ async fn main_terminal(db: &Surreal<Client>) {
                             println!("Failed to get list of entries!");
                         }
                     }
+                    3 => {
+                        let add_works = db::get_all_works(db)
+                            .await
+                            .expect("Failed to get all saved works");
+                        vector.extend(add_works);
+                    }
                     _ => continue 'main_loop,
                 }
             }
             MainSelect::ListFiles => {
                 let current_dir = file_work::get_current_path_buf();
                 if let Ok(vec) = file_work::dir(current_dir.join("saved_works").as_path()) {
-                    for (index, path) in vec.iter().enumerate() {
-                        println!("#{}. {}", index + 1, path.display());
-                    }
-                    dbg!(&vec);
                     let path = vec
-                        .get((terminal::user_select("Which one do you want to use?") - 1) as usize)
+                        .get((terminal::user_select(vec.clone()) - 1) as usize)
                         .expect("Failed to get this path");
 
                     terminal::import_from_default(path.as_path(), &mut vector);

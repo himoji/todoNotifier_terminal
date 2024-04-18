@@ -2,8 +2,8 @@ use std::error::Error;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 
-use crate::{file_work, time_work};
 use crate::work::{Work, WorkParams};
+use crate::{file_work, time_work};
 
 pub enum MainSelect {
     NewWork,
@@ -15,9 +15,17 @@ pub enum MainSelect {
     Error,
 }
 
-pub fn user_select(string_show: &str) -> u8 {
+pub fn user_select<T>(str_vec: Vec<T>) -> u8
+where
+    T: AsRef<Path>,
+{
     //!Prints string_show and returns user's input as on option in u8
-    let select = user_input_raw(string_show);
+
+    for (i, string) in str_vec.iter().enumerate() {
+        println!("#{}) {}", i + 1, string.as_ref().to_string_lossy())
+    }
+
+    let select = user_input_raw("");
 
     let select: u8 = select.trim().parse().expect("Failed to parse the int!");
     select
@@ -77,16 +85,21 @@ pub fn user_input_path_buf() -> PathBuf {
 pub fn select_print() -> MainSelect {
     //!Main select function.
 
-    match user_select("Select:\n1) New work\n2) Edit work\n3) Export Year\n4) Print readable\n5) Import from JSON\n6) List saved files") {
+    match user_select(vec![
+        "New work",
+        "Edit work",
+        "Export Year",
+        "Print readable",
+        "Import from JSON",
+        "List saved files",
+    ]) {
         1 => MainSelect::NewWork,
         2 => MainSelect::EditWork,
         3 => MainSelect::ExportWorks,
         4 => MainSelect::PrintReadable,
         5 => MainSelect::ImportFromJSON,
         6 => MainSelect::ListFiles,
-        _ => {
-            MainSelect::Error
-        }
+        _ => MainSelect::Error,
     }
 }
 
@@ -114,7 +127,7 @@ pub fn input_create_work_params() -> Vec<WorkParams> {
 pub fn input_edit_work_params() -> WorkParams {
     //! Return a single work parameter (name, desc, date_start, date_end) from the user input
     loop {
-        let select = user_select("What param: \n1)Name\n2)Description\n3)Start time\n4)End time");
+        let select = user_select(vec!["Name", "Description", "Start time", "End time"]);
 
         match select {
             1 => return WorkParams::Name(user_input::<String>("New value:")),
@@ -161,5 +174,15 @@ pub fn import_from_default(path: &Path, vector: &mut Vec<Work>) {
         let add_works = Work::from_vec_string(file_work::read_file(path));
         vector.extend(add_works);
         println!("Imported successfully");
+    }
+}
+
+pub trait PathBufDisplay {
+    fn to_string_lossy(&self) -> String;
+}
+
+impl PathBufDisplay for PathBuf {
+    fn to_string_lossy(&self) -> String {
+        self.to_string_lossy().to_string()
     }
 }
