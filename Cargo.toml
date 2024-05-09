@@ -1,14 +1,20 @@
 [package]
 name = "todo_term"
-version = "2.4.3"
+version = "2.4.4"
 edition = "2021"
-
+build = "build.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 chrono = "0.4.38"
-serde_json = "1.0.116"
-serde = { version = "1.0.198", features = ["derive"] }
+serde_json = "1.0.117"
+serde = { version = "1.0.201", features = ["derive"] }
 humantime = "*"
-surrealdb = "1.4.0"
-tokio = "*"
+tokio = { version = "1", features = ["full"] }
+tonic = "0.11.0"
+prost = "0.12.4"
+prost-build = "0.12.4"
+tonic-build = "0.11.0"
+
+[build-dependencies]
+tonic-build = "0.11.0"

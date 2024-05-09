@@ -1,19 +1,26 @@
-use surrealdb::engine::remote::ws::{Client, Ws};
-use surrealdb::Surreal;
+use std::error::Error;
+
+use tonic::transport::Channel;
 
 use terminal::MainSelect;
 use work::Work;
 
-mod db;
+use crate::proto::db_api_client::DbApiClient;
+
 mod file_work;
+mod proto_work;
 mod string_work;
 mod terminal;
 mod time_work;
 mod work;
 
+pub mod proto {
+    tonic::include_proto!("db_api");
+}
+
 const MAX_SIZE: usize = 10;
 
-async fn main_terminal(db: &Surreal<Client>) {
+async fn main_terminal(client: &mut DbApiClient<Channel>) {
     let mut vector: Vec<Work> = Vec::with_capacity(MAX_SIZE);
 
     'main_loop: loop {
@@ -42,15 +49,27 @@ async fn main_terminal(db: &Surreal<Client>) {
                 match select {
                     1 => {
                         terminal::export_works(vector.clone());
-                        db::add_works_vec(db, vector.clone())
-                            .await
-                            .expect("Failed to commit to db!");
+
+                        for work in vector.clone() {
+                            println!(
+                                "{}",
+                                proto_work::add_work(client, work)
+                                    .await
+                                    .expect("Failed to add work")
+                            );
+                        }
                     }
                     2 => {
                         terminal::export_filter_works(vector.clone());
-                        db::add_filter_works_vec(db, vector.clone())
-                            .await
-                            .expect("Failed to commit to db!");
+
+                        for work in vector.clone() {
+                            println!(
+                                "{}",
+                                proto_work::add_work(client, work)
+                                    .await
+                                    .expect("Failed to add work")
+                            );
+                        }
                     }
                     _ => continue 'main_loop,
                 }
@@ -64,7 +83,7 @@ async fn main_terminal(db: &Surreal<Client>) {
                 let select = terminal::user_select(vec![
                     "From custom path",
                     "Default saved file",
-                    "From the database",
+                    //"From the database",
                 ]);
                 match select {
                     1 => {
@@ -86,12 +105,6 @@ async fn main_terminal(db: &Surreal<Client>) {
                         } else {
                             println!("Failed to get list of entries!");
                         }
-                    }
-                    3 => {
-                        let add_works = db::get_all_works(db)
-                            .await
-                            .expect("Failed to get all saved works");
-                        vector.extend(add_works);
                     }
                     _ => continue 'main_loop,
                 }
@@ -117,11 +130,11 @@ async fn main_terminal(db: &Surreal<Client>) {
 }
 
 #[tokio::main]
-async fn main() -> surrealdb::Result<()> {
-    let db = Surreal::new::<Ws>("127.0.0.1:8000").await?;
-    db.use_ns("test").use_db("test").await?;
+async fn main() -> Result<(), Box<dyn Error>> {
+    let url = "http://[::1]:50051";
+    let mut client = DbApiClient::connect(url).await?;
 
-    main_terminal(&db).await;
+    main_terminal(&mut client).await;
 
     Ok(())
 }
