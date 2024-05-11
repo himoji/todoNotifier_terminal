@@ -955,7 +955,7 @@ dependencies = [
 
 [[package]]
 name = "todo_term"
-version = "2.4.4"
+version = "2.4.5"
 dependencies = [
  "chrono",
  "humantime",

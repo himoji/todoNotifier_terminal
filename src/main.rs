@@ -6,6 +6,7 @@ use terminal::MainSelect;
 use work::Work;
 
 use crate::proto::db_api_client::DbApiClient;
+use crate::proto_work::get_all_works;
 
 mod file_work;
 mod proto_work;
@@ -62,7 +63,13 @@ async fn main_terminal(client: &mut DbApiClient<Channel>) {
                     2 => {
                         terminal::export_filter_works(vector.clone());
 
-                        for work in vector.clone() {
+                        let works = get_all_works(client)
+                            .await
+                            .expect("Failed to get all works");
+
+                        let filtered_works = Work::remove_duplicates(works, vector.clone());
+
+                        for work in filtered_works {
                             println!(
                                 "{}",
                                 proto_work::add_work(client, work)

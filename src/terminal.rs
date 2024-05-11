@@ -2,8 +2,8 @@ use std::error::Error;
 use std::io::{self, Write};
 use std::path::{Path, PathBuf};
 
-use crate::work::{Work, WorkParams};
 use crate::{file_work, time_work};
+use crate::work::{Work, WorkParams};
 
 pub enum MainSelect {
     NewWork,
@@ -182,6 +182,7 @@ pub trait PathBufDisplay {
 }
 
 impl PathBufDisplay for PathBuf {
+    #[warn(unconditional_recursion)]
     fn to_string_lossy(&self) -> String {
         self.to_string_lossy().to_string()
     }
