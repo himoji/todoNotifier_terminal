@@ -89,7 +89,7 @@ async fn main_terminal(client: &mut DbApiClient<Channel>) {
                 let select = terminal::user_select(vec![
                     "From custom path",
                     "Default saved file",
-                    //"From the database",
+                    "From the database",
                 ]);
                 match select {
                     1 => {
@@ -111,6 +111,12 @@ async fn main_terminal(client: &mut DbApiClient<Channel>) {
                         } else {
                             println!("Failed to get list of entries!");
                         }
+                    }
+                    3 => {
+                        let a = proto_work::proto_get_all_works(client)
+                            .await
+                            .expect("Failed to get all works");
+                        vector.extend(a);
                     }
                     _ => continue 'main_loop,
                 }
