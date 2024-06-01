@@ -6,6 +6,19 @@ service db_api{
   rpc AddWork(ProtoWork) returns (ProtoWorkIndex);
   rpc GetWork(ProtoWorkIndex) returns (ProtoWork);
   rpc GetAllWorks(Empty) returns (GetAllWorksResponse);
+  rpc EditWork(ProtoWorkParam) returns (ProtoWork);
+}
+enum WorkParamEnum {
+  Name = 0;
+  Desc = 1;
+  DateStart = 2;
+  DateEnd = 3;
+}
+
+message ProtoWorkParam {
+  string index = 1;
+  WorkParamEnum enum = 2;
+  string value = 3;
 }
 
 message ProtoWork {
@@ -20,7 +33,15 @@ message ProtoWorkIndex{
 }
 
 message GetAllWorksResponse {
-  repeated ProtoWork works = 1;
+  repeated ProtoWorkWithId works = 1;
 }
 
 message Empty {}
+
+message ProtoWorkWithId {
+  string name = 1;
+  string desc = 2;
+  int64 date_start = 3;
+  int64 date_end = 4;
+  string index = 5;
+}

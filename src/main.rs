@@ -6,7 +6,6 @@ use terminal::MainSelect;
 use work::Work;
 
 use crate::proto::db_api_client::DbApiClient;
-use crate::proto_work::get_all_works;
 
 mod file_work;
 mod proto_work;
@@ -49,34 +48,34 @@ async fn main_terminal(client: &mut DbApiClient<Channel>) {
                 let select = terminal::user_select(vec!["Export all", "Filter and export"]);
                 match select {
                     1 => {
-                        terminal::export_works(vector.clone());
-
-                        for work in vector.clone() {
-                            println!(
-                                "{}",
-                                proto_work::add_work(client, work)
-                                    .await
-                                    .expect("Failed to add work")
-                            );
+                        for work in &mut vector {
+                            match proto_work::proto_add_work(client, work.clone()).await {
+                                Ok(a) => {
+                                    work.id = a;
+                                }
+                                Err(e) => eprintln!("Failed to add work: {}", e),
+                            }
                         }
+
+                        terminal::export_works(vector.clone());
                     }
                     2 => {
-                        terminal::export_filter_works(vector.clone());
-
-                        let works = get_all_works(client)
+                        let works = proto_work::proto_get_all_works(client)
                             .await
                             .expect("Failed to get all works");
 
-                        let filtered_works = Work::remove_duplicates(works, vector.clone());
+                        let mut filtered_works = Work::remove_duplicates(works, vector.clone());
 
-                        for work in filtered_works {
-                            println!(
-                                "{}",
-                                proto_work::add_work(client, work)
-                                    .await
-                                    .expect("Failed to add work")
-                            );
+                        for work in &mut filtered_works {
+                            match proto_work::proto_add_work(client, work.clone()).await {
+                                Ok(a) => {
+                                    work.id = a;
+                                }
+                                Err(e) => eprintln!("Failed to add work: {}", e),
+                            }
                         }
+
+                        terminal::export_filter_works(filtered_works.clone());
                     }
                     _ => continue 'main_loop,
                 }

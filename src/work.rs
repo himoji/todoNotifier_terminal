@@ -25,6 +25,7 @@ pub struct Work {
     pub desc: String,
     pub date_start: i64,
     pub date_end: i64,
+    pub id: String,
 }
 
 impl Work {
@@ -36,15 +37,17 @@ impl Work {
             desc: "".to_string(),
             date_start: 0,
             date_end: 0,
+            id: "".to_string(),
         }
     }
-    pub fn from(name: String, desc: String, date_start: i64, date_end: i64) -> Work {
+    pub fn from(name: String, desc: String, date_start: i64, date_end: i64, index: String) -> Work {
         //!Creates work with specified params
         Work {
             name,
             desc,
             date_start,
             date_end,
+            id: index,
         }
     }
 
@@ -105,6 +108,7 @@ impl Work {
                 desc,
                 date_start,
                 date_end,
+                id: "".to_string(),
             })
         }
     }
@@ -112,7 +116,7 @@ impl Work {
         //!Parse from String Vec
         serde_json::from_str(&string)
             .map_err(|e| println!("Failed to convert into work: {e}"))
-            .expect("")
+            .unwrap_or_else(|_| vec![])
     }
 
     #[allow(dead_code)]
@@ -169,7 +173,7 @@ impl Work {
 
 impl std::fmt::Display for Work {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "Name: {}\nDesc: {}\nStart: {}\nDuration: {}\nEnd: {}\nProgress by time passed: {}%\n{}\n", self.name, self.desc, chrono::Local.timestamp_opt(self.date_start, 0).unwrap(), humantime::format_duration(Duration::from_secs((self.date_end - self.date_start).unsigned_abs())), chrono::Local.timestamp_opt(self.date_end, 0).unwrap(), self.get_time_progress(), self.get_time_progress_graph())
+        write!(f, "Name: {}\nDesc: {}\nStart: {}\nID: {}\nDuration: {}\nEnd: {}\nProgress by time passed: {}%\n{}\n", self.name, self.desc, chrono::Local.timestamp_opt(self.date_start, 0).unwrap(), self.id,humantime::format_duration(Duration::from_secs((self.date_end - self.date_start).unsigned_abs())), chrono::Local.timestamp_opt(self.date_end, 0).unwrap(), self.get_time_progress(), self.get_time_progress_graph())
     }
 }
 
